@@ -3,23 +3,23 @@ package ru.kata.spring.boot_security.demo.configs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import javax.sql.DataSource;
+import ru.kata.spring.boot_security.demo.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     private final SuccessUserHandler successUserHandler;
-    private final DataSource dataSource;
+    private final UserService userDetailsService;
 
     @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, DataSource dataSource) {
-        this.dataSource = dataSource;
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
+        this.userDetailsService = userService;
         this.successUserHandler = successUserHandler;
     }
 
@@ -43,16 +43,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.jdbcAuthentication().dataSource(dataSource)
-                .passwordEncoder(getPasswordEncoder())
-                .usersByUsernameQuery("select username, password, enabled from users where username = ?")
-                .authoritiesByUsernameQuery("SELECT users.username, roles.authority FROM users, user_roles, roles WHERE users.id = user_roles.user_id AND user_roles.role_id = roles.id AND users.username = ?");
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(getPasswordEncoder());
+        return authProvider;
     }
 
     @Bean
-    public BCryptPasswordEncoder getPasswordEncoder(){
+    public static BCryptPasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder();
     }
 

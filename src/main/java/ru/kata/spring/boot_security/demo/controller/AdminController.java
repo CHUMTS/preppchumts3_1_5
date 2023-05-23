@@ -1,7 +1,6 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +14,12 @@ public class AdminController {
 
     private final RoleService roleService;
     private final UserService userService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
-    public AdminController(UserService userService, BCryptPasswordEncoder encoder, RoleService roleService) {
-        this.bCryptPasswordEncoder = encoder;
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
     }
+
 
     @GetMapping(value = "/users")
     public String usersListPage(Model model){
@@ -38,9 +36,6 @@ public class AdminController {
 
     @GetMapping(value = "users/{id}/edit")
     public String userEditForm(@PathVariable("id") Long id, Model model){
-        if (userService.findUserById(id).isEmpty()) {
-            return "adminMainPage";
-        }
         model.addAttribute("allRoles", roleService.getAllRoles());
         model.addAttribute("user", userService.findUserById(id).get());
         return "edit";
@@ -54,7 +49,6 @@ public class AdminController {
 
     @PatchMapping(value = "users/{id}/edit")
     public String receiveUserEditForm( User user){
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userService.saveUser(user);
         return "redirect:/admin/users";
     }
@@ -67,7 +61,6 @@ public class AdminController {
 
     @PostMapping(value = "/users")
     public String receiveNewUserForm(User user){
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userService.saveUser(user);
         return "redirect:/admin/users";
     }
