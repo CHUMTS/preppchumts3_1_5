@@ -28,9 +28,7 @@ public class Role implements GrantedAuthority {
 
     @Override
     public String toString() {
-        return "Role{" +
-                "name='" + authority + '\'' +
-                '}';
+        return getAuthority();
     }
 
     public Long getId() {

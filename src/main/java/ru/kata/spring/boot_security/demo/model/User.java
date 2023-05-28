@@ -27,8 +27,8 @@ public class User implements UserDetails {
     @Column(name = "enabled")
     private boolean enabled = true;
 
-    @Column(name = "surname")
-    private String surname;
+    @Column(name = "email")
+    private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
@@ -86,12 +86,12 @@ public class User implements UserDetails {
         return username;
     }
 
-    // surname
-    public String getSurname() {
-        return surname;
+    // email
+    public String getEmail() {
+        return email;
     }
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 
@@ -120,7 +120,7 @@ public class User implements UserDetails {
         return "User: \n" +
                 "id = " + id +
                 ", name= " + username +
-                ", surname=" + surname + ".";
+                ", email=" + email + ".";
     }
 
 }

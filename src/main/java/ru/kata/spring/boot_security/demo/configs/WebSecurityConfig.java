@@ -8,7 +8,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.kata.spring.boot_security.demo.service.UserService;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -27,10 +34,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-            .antMatchers("/user/**")
+            .antMatchers("/main")
             .hasAnyAuthority("ADMIN", "USER")
-            .antMatchers("/admin/**")
-            .hasAuthority("ADMIN")
             .anyRequest().authenticated()
         .and()
             .formLogin().successHandler(successUserHandler)
@@ -42,6 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .logoutSuccessUrl("/login?logout")
             .permitAll();
     }
+
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
