@@ -29,14 +29,16 @@ public class RoleServiceImpl implements RoleService {
         return roledao.findByAuthority(authority);
     }
 
+    @Override
     public Optional<Role> findById(Long id){
         return roledao.findById(id);
     }
 
+    @Override
     public Set<Role> mapCollectionToRoles(Collection<Long> roles) {
         return roles.stream()
                 .map(this::findById)
-                .map(Optional::orElseThrow)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

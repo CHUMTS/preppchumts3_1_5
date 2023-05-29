@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.model.UserDTO;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
@@ -27,7 +28,7 @@ public class MainController {
     }
 
 
-    @GetMapping(value = "/main")
+    @GetMapping(value = "/main", produces="application/json")
     public String usersListPage(Model model){
         model.addAttribute("usersList", userService.getAllUsers());
         model.addAttribute("loggedUser",
@@ -37,11 +38,16 @@ public class MainController {
         return "allUsers";
     }
 
-    @PostMapping(value = "/main/{id}/edit", consumes = "application/x-www-form-urlencoded")
-    public String receiveUserEditForm(@RequestBody User user, @RequestParam("roles") List<Long> roleIds){
-        user.setRoles(roleService.mapCollectionToRoles(roleIds));
-        userService.saveUser(user);
+    @PutMapping(value = "/main")
+    public String receiveUserEditForm(@RequestBody UserDTO dto){
+        userService.saveUser(userService.mapDTOToUser(dto));
         return "redirect:/main";
+    }
+
+    @PatchMapping("/main")
+    public String updateUser(User user) {
+        userService.saveUser(user);
+        return "redirect:/admin";
     }
 
     @DeleteMapping(value = "/main/{id}/delete")

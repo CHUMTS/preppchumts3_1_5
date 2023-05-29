@@ -207,14 +207,14 @@
     });
 
     $('#save-user-button').click(function (event) {
-        // event.preventDefault();
+        event.preventDefault();
         let modal = $('#editUserModal')
         let userId = document.getElementById('userId').value;
         let username = document.getElementById('editUsername').value;
         let email = document.getElementById('editEmail').value;
         let password = document.getElementById('editPassword').value;
         let roles = [];
-        $('input[type=checkbox][name=editRoles]:checked').each(function() { // тут пушатся в "roles" те значения, которые помечены чекбоксом, в виде Long
+        $('input[type=checkbox][name=editRoles]:checked').each(function() {
             roles.push($(this).val());
         });
         let csrfToken = $("meta[name='_csrf']").attr("content");

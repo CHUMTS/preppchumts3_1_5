@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.configs.WebSecurityConfig;
 import ru.kata.spring.boot_security.demo.dao.UserDao;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.model.UserDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,14 +19,15 @@ public class UserServiceImp implements UserService {
 
     private final UserDao userDao;
     private final BCryptPasswordEncoder encoder = WebSecurityConfig.getPasswordEncoder();
+    private final RoleService roleService;
 
     @Autowired
-    public UserServiceImp(UserDao userDao) {
+    public UserServiceImp(UserDao userDao, RoleService service) {
+        this.roleService = service;
         this.userDao = userDao;
     }
 
     @Override
-    @Transactional
     public void saveUser(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         userDao.save(user);
@@ -50,13 +52,11 @@ public class UserServiceImp implements UserService {
         return userDao.findAll();
     }
 
-    @Transactional
     @Override   // from UserDetailsService
     public User findUserByUsername(String email) {
         return userDao.findUserByUsername(email);
     }
 
-    @Transactional
     @Override   // from UserDetailsService.
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userDao.findUserByEmail(email);
@@ -69,9 +69,19 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    @Transactional
     public User findUserByEmail(String email){
         return userDao.findUserByEmail(email);
+    }
+
+    @Override
+    public User mapDTOToUser(UserDTO dto){
+        User user = new User();
+        user.setId(dto.getId());
+        user.setPassword(encoder.encode(dto.getPassword()));
+        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
+        user.setRoles(roleService.mapCollectionToRoles(dto.getRoles()));
+        return user;
     }
 
 }
