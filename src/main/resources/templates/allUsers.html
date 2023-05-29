@@ -207,7 +207,7 @@
     });
 
     $('#save-user-button').click(function (event) {
-        // event.preventDefault();
+        event.preventDefault();
         let modal = $('#editUserModal')
         let userId = document.getElementById('userId').value;
         let username = document.getElementById('editUsername').value;
@@ -236,8 +236,11 @@
             beforeSend: function(xhr) {
                 xhr.setRequestHeader(csrfHeader, csrfToken);
             },
-            error: (err) => {
-                alert("Error: " + err.status + "text: "+ err.responseText);
+            success: function() {
+                location.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert("Error: " + jqXHR.status + "\ntext: "+ jqXHR.responseText + "\nerrorThrown: " + errorThrown);
             }
         })
         modal.modal('hide');
@@ -245,14 +248,14 @@
 </script>
 <script>
     $(document).ready(function() {
-        // Initially hide user panel
+        // Изначально спрятать панель своих юзерданных
         $("#userPanel").hide();
-// Toggle visibility on button click
+        // переключить на клик кнопки
         $(".btn-group .btn").click(function() {
             console.log($(this).text());
             let id = $(this).text().trim().toLowerCase() + "Panel";
-            $("#adminPanel, #userPanel").hide(); // hide all panels
-            $("#" + id).show(); // show the clicked panel
+            $("#adminPanel, #userPanel").hide(); // спрятать все панели
+            $("#" + id).show(); // показать выбранную панель
         });
 
     });

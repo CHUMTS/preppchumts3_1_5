@@ -54,14 +54,14 @@ public class UserServiceImp implements UserService {
 
     @Override   // from UserDetailsService
     public User findUserByUsername(String email) {
-        return userDao.findUserByUsername(email);
+        return userDao.findUserByUsername(email); // для аутентификации используем емейл
     }
 
-    @Override   // from UserDetailsService.
+    @Override   // from UserDetailsService
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userDao.findUserByEmail(email);
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())  // we need to find user by his Email to authenticate
+                .username(user.getEmail())  // для аутентификации используем емейл
                 .password(user.getPassword())
                 .authorities(user.getAuthorities())
                 .disabled(false)
@@ -77,7 +77,7 @@ public class UserServiceImp implements UserService {
     public User mapDTOToUser(UserDTO dto){
         User user = new User();
         user.setId(dto.getId());
-        user.setPassword(encoder.encode(dto.getPassword()));
+        user.setPassword(dto.getPassword());
         user.setEmail(dto.getEmail());
         user.setUsername(dto.getUsername());
         user.setRoles(roleService.mapCollectionToRoles(dto.getRoles()));

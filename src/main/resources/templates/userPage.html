@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>All Users</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<header class="bg-dark text-white py-2">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <span class="mr-2">Email:</span>
+            <b th:text="${loggedUser.getEmail()}"></b>
+        </div>
+        <div>
+            <a th:href="@{/logout}" class="btn btn-light">Logout</a>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2 bg-light">
+            <div class="my-3">
+                <div class="btn-group d-flex flex-column" role="group">
+                    <button type="button" class="btn btn-primary">USER</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-10">
+            <!-- User Panel -->
+            <div id="userPanel">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td th:text="${loggedUser.getId()}"></td>
+                            <td th:text="${loggedUser.getUsername()}"></td>
+                            <td th:text="${loggedUser.getEmail()}"></td>
+                            <td>
+                                <span th:each="role : ${loggedUser.getRoles()}" th:text="${role.getAuthority()}+' '"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        // Initially hide user panel
+        $("#userPanel").open();
+        // Toggle visibility on button click
+        $(".btn-group .btn").click(function() {
+            console.log($(this).text());
+            let id = $(this).text().trim().toLowerCase() + "Panel";
+            $("#" + id).show(); // show the clicked panel
+        });
+
+    });
+</script>
+</body>
+</html>

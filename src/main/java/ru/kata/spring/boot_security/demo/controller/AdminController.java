@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -14,41 +15,37 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
-public class MainController {
+public class AdminController {
 
     private final RoleService roleService;
     private final UserService userService;
     @Autowired
-    public MainController(UserService userService, RoleService roleService) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
     }
 
 
     @GetMapping(value = "/main", produces="application/json")
-    public String usersListPage(Model model){
+    public String usersListPage(Model model, Principal principal){
         model.addAttribute("usersList", userService.getAllUsers());
         model.addAttribute("loggedUser",
-                userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+                userService.findUserByEmail(principal.getName()));
         model.addAttribute("allRoles", roleService.getAllRoles());
         model.addAttribute("newUser", new User());
         return "allUsers";
     }
 
     @PutMapping(value = "/main")
-    public String receiveUserEditForm(@RequestBody UserDTO dto){
+    public ResponseEntity<Void> receiveUserEditForm(@RequestBody UserDTO dto){
         userService.saveUser(userService.mapDTOToUser(dto));
-        return "redirect:/main";
+        return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/main")
-    public String updateUser(User user) {
-        userService.saveUser(user);
-        return "redirect:/admin";
-    }
 
     @DeleteMapping(value = "/main/{id}/delete")
     public String deleteUser(@PathVariable("id") Long id){
