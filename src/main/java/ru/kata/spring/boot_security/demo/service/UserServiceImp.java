@@ -28,6 +28,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @Transactional
     public void saveUser(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         userDao.save(user);
@@ -53,11 +54,13 @@ public class UserServiceImp implements UserService {
     }
 
     @Override   // from UserDetailsService
+    @Transactional(readOnly = true)
     public User findUserByUsername(String email) {
         return userDao.findUserByUsername(email); // для аутентификации используем емейл
     }
 
     @Override   // from UserDetailsService
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userDao.findUserByEmail(email);
         return org.springframework.security.core.userdetails.User.builder()
@@ -69,6 +72,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findUserByEmail(String email){
         return userDao.findUserByEmail(email);
     }

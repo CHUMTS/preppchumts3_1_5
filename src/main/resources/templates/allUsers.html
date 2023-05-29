@@ -13,7 +13,7 @@
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
             <span class="mr-2">Email:</span>
-            <b th:text="${loggedUser.getEmail()}"></b>
+            <b th:text="${loggedUser.getEmail()} + ' with roles '+${loggedUser.getRoles()}"></b>
         </div>
         <div>
             <a th:href="@{/logout}" class="btn btn-light">Logout</a>
@@ -63,9 +63,11 @@
                                         <span th:each="role : ${user.getRoles()}" th:text="${role.getAuthority()+' '}"></span>
                                     </td>
                                     <td>
-                                        <form th:method="DELETE" th:action="@{/main/{id}/delete(id=${user.getId()})}">
-                                            <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
-                                        </form>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteUserModal"
+                                                th:data-id="${user.getId()}" th:data-name="${user.getUsername()}" th:data-email="${user.getEmail()}"
+                                                th:data-roles="${#strings.listJoin(user.getRoles(), ',')}">
+                                            Delete
+                                        </button>
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editUserModal"
@@ -136,7 +138,48 @@
         </div>
     </div>
 </div>
+<!-- Модальное окно удаления пользователя -->
+<div id="deleteUserModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="deleteForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete user</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="userIdDelete">User ID</label>
+                        <input type="text" class="form-control" id="userIdDelete" name="id" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="deleteUsername">Username</label>
+                        <input type="text" class="form-control" id="deleteUsername" name="username" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="deleteEmail">Email</label>
+                        <input type="text" class="form-control" id="deleteEmail" name="email" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="deletePassword">Password</label>
+                        <input type="text" class="form-control" id="deletePassword" name="password" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="deletePassword">Roles</label>
+                        <input type="text" class="form-control" id="deleteRoles" name="password" disabled/>
+                    </div>
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="delete-user-button" type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- Модальное окно редактирования пользователя -->
 <div id="editUserModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -150,7 +193,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="userId">User ID</label>
+                        <label for="userIdDelete">User ID</label>
                         <input type="text" class="form-control" id="userId" name="id" readonly/>
                     </div>
                     <div class="form-group">
@@ -191,6 +234,23 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<script>
+    $(document).ready(function() {
+        $('#deleteUserModal').on('show.bs.modal', function(event) {
+            let button = $(event.relatedTarget);
+            let id = button.data('id');
+            let name = button.data('name');
+            let email = button.data('email');
+            let roles = button.data('roles').split(','); // Преобразование строки в список
+
+            let modal = $(this);
+            modal.find('#userIdDelete').val(id);
+            modal.find('#deleteUsername').val(name);
+            modal.find('#deleteEmail').val(email);
+            modal.find('#deleteRoles').val(roles);
+        });
+    })
+</script>
 <script>
     $('#editUserModal').on('show.bs.modal', function (event) {
         let button = $(event.relatedTarget); // Кнопка, вызвавшая модальное окно.
