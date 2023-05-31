@@ -19,6 +19,7 @@ import java.security.Principal;
 import java.util.List;
 
 @Controller
+@RequestMapping("/admin")
 public class AdminController {
 
     private final RoleService roleService;
@@ -30,7 +31,7 @@ public class AdminController {
     }
 
 
-    @GetMapping(value = "/main", produces="application/json")
+    @GetMapping(produces="application/json")
     public String usersListPage(Model model, Principal principal){
         model.addAttribute("usersList", userService.getAllUsers());
         model.addAttribute("loggedUser",
@@ -40,24 +41,24 @@ public class AdminController {
         return "allUsers";
     }
 
-    @PutMapping(value = "/main")
+    @PutMapping
     public ResponseEntity<Void> receiveUserEditForm(@RequestBody UserDTO dto){
         userService.saveUser(userService.mapDTOToUser(dto));
         return ResponseEntity.noContent().build();
     }
 
 
-    @DeleteMapping(value = "/main/{id}/delete")
+    @DeleteMapping(value = "/{id}/delete")
     public String deleteUser(@PathVariable("id") Long id){
         userService.removeUserById(id);
-        return "redirect:/main";
+        return "redirect:/admin";
     }
 
-    @PostMapping(value = "/main")
+    @PostMapping
     public String receiveNewUserForm(User user, @RequestParam("roles") List<Long> roleIds){
         user.setRoles(roleService.mapCollectionToRoles(roleIds));
         userService.saveUser(user);
-        return "redirect:/main";
+        return "redirect:/admin";
     }
 
     @GetMapping("/logout")

@@ -82,7 +82,7 @@
                     </div>
                     <div class="tab-pane fade" id="newUser">
                         <!-- Form for creating new user -->
-                        <form th:object="${newUser}" th:method="POST" th:action="@{/main}">
+                        <form th:object="${newUser}" th:method="POST" th:action="@{/admin}">
                             <div class="form-group">
                                 <label for="name">Name</label>
                                 <input type="text" th:field="*{username}" class="form-control" id="name" name="username" required>
@@ -234,7 +234,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script>
+<script>  // окно удаления
     $(document).ready(function() {
         $('#deleteUserModal').on('show.bs.modal', function(event) {
             let button = $(event.relatedTarget);
@@ -250,8 +250,35 @@
             modal.find('#deleteRoles').val(roles);
         });
     })
+    $('#delete-user-button').click( function(event) {
+        event.preventDefault();
+        let userId = $('#userIdDelete').val();
+        let csrfToken = $("meta[name='_csrf']").attr("content");
+        let csrfHeader = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            url: '/admin/' + userId + '/delete',
+            type: 'POST',
+            data: {_method: 'delete'},
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            },
+            success: function(result) {
+                location.reload();
+            }
+        });
+        // $.ajax({
+        //     url: 'http://localhost:8080/admin/' + userId + '/delete',
+        //     type: 'DELETE',
+        //     success: function(result) {
+        //         location.reload();
+        //  },
+        //     error: function(jqXHR, textStatus, errorThrown) {
+        //         alert("Error: " + jqXHR.status + "\ntext: "+ jqXHR.responseText + "\nerrorThrown: " + errorThrown);
+        //     }
+        // });
+    });
 </script>
-<script>
+<script>  // окно редактирования
     $('#editUserModal').on('show.bs.modal', function (event) {
         let button = $(event.relatedTarget); // Кнопка, вызвавшая модальное окно.
         let userId = button.data('id');  // берём значения,
@@ -288,7 +315,7 @@
             roles: roles
         };
         $.ajax({
-            url: 'http://localhost:8080/main',
+            url: 'http://localhost:8080/admin',
             type: 'PUT',
             data: JSON.stringify(user),
             dataType: 'json',
