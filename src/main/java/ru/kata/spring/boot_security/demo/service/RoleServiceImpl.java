@@ -38,7 +38,7 @@ public class RoleServiceImpl implements RoleService {
     public Set<Role> mapCollectionToRoles(Collection<Long> roles) {
         return roles.stream()
                 .map(this::findById)
-                .map(Optional::get)
+                .map(Optional::orElseThrow)
                 .collect(Collectors.toSet());
     }
 
