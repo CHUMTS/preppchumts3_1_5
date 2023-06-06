@@ -46,7 +46,8 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    // password - OVERRIDED method here
+    /*           GETTERS AND SETTERS               */
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -54,7 +55,6 @@ public class User implements UserDetails {
         return password;
     }
 
-    // enabled - OVERRIDED method here
     public boolean isEnabled() {
         return enabled;
     }
@@ -62,7 +62,6 @@ public class User implements UserDetails {
         this.enabled = enabled;
     }
 
-    // roles
     public Set<Role> getRoles() {
         return roles;
     }
@@ -70,7 +69,6 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    // id
     public long getId() {
         return id;
     }
@@ -78,7 +76,6 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    // username - OVERRIDED method here
     public void setUsername(String name) {
         this.username = name;
     }
@@ -86,7 +83,6 @@ public class User implements UserDetails {
         return username;
     }
 
-    // email
     public String getEmail() {
         return email;
     }
@@ -94,6 +90,7 @@ public class User implements UserDetails {
         this.email = email;
     }
 
+    /*           GETTERS AND SETTERS               */
 
 
 

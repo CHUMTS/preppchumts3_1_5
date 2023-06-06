@@ -12,11 +12,11 @@
 <header class="bg-dark text-white py-2">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <span class="mr-2">Email:</span>
-            <b th:text="${loggedUser.getEmail()}"></b>
+            <span class="mr-2">Email: <span id="userEmail"></span></span>
+            <span class="mr-2">Roles: <span id="userRoles"></span></span>
         </div>
         <div>
-            <a th:href="@{/logout}" class="btn btn-light">Logout</a>
+            <a href="/logout" class="btn btn-light">Logout</a>
         </div>
     </div>
 </header>
@@ -33,24 +33,17 @@
         <div class="col-10">
             <!-- User Panel -->
             <div id="userPanel">
-                <table class="table">
+                <table class="table" id="userTable">
                     <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Username</th>
                         <th>Email</th>
                         <th>Roles</th>
                     </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td th:text="${loggedUser.getId()}"></td>
-                            <td th:text="${loggedUser.getUsername()}"></td>
-                            <td th:text="${loggedUser.getEmail()}"></td>
-                            <td>
-                                <span th:each="role : ${loggedUser.getRoles()}" th:text="${role.getAuthority()}+' '"></span>
-                            </td>
-                        </tr>
+                    <tbody id="userTableBody">
+                    <!-- Таблица будет заполняться данными из скрипта -->
                     </tbody>
                 </table>
             </div>
@@ -65,18 +58,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
-<script>
-    $(document).ready(function() {
-        // Initially hide user panel
-        $("#userPanel").open();
-        // Toggle visibility on button click
-        $(".btn-group .btn").click(function() {
-            console.log($(this).text());
-            let id = $(this).text().trim().toLowerCase() + "Panel";
-            $("#" + id).show(); // show the clicked panel
-        });
-
-    });
+<script src="/js/user.js">
 </script>
 </body>
 </html>

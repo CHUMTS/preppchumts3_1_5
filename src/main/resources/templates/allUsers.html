@@ -12,11 +12,11 @@
 <header class="bg-dark text-white py-2">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <span class="mr-2">Email:</span>
-            <b th:text="${loggedUser.getEmail()} + ' with roles '+${loggedUser.getRoles()}"></b>
+            <span class="mr-2">Email: <span id="userEmail"></span></span>
+            <span class="mr-2">Roles: <span id="userRoles"></span></span>
         </div>
         <div>
-            <a th:href="@{/logout}" class="btn btn-light">Logout</a>
+            <a href="/logout" class="btn btn-light">Logout</a>
         </div>
     </div>
 </header>
@@ -52,59 +52,34 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Roles</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="user, userIteration : ${usersList}">
-                                    <td th:text="${user.getId()}"> </td>
-                                    <td th:text="${user.getUsername()}"> </td>
-                                    <td th:text="${user.getEmail()}"> </td>
-                                    <td>
-                                        <span th:each="role : ${user.getRoles()}" th:text="${role.getAuthority()+' '}"></span>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteUserModal"
-                                                th:data-id="${user.getId()}" th:data-name="${user.getUsername()}" th:data-email="${user.getEmail()}"
-                                                th:data-roles="${#strings.listJoin(user.getRoles(), ',')}">
-                                            Delete
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editUserModal"
-                                                th:data-id="${user.getId()}" th:data-name="${user.getUsername()}" th:data-email="${user.getEmail()}">
-                                            Edit
-                                        </button>
-                                    </td>
-
-                                </tr>
+                            <!--  тут цикл заполнения таблицы юзеров с БД -->
                             </tbody>
                         </table>
                     </div>
                     <div class="tab-pane fade" id="newUser">
                         <!-- Form for creating new user -->
-                        <form th:object="${newUser}" th:method="POST" th:action="@{/admin}">
+                        <form id="user-form">
                             <div class="form-group">
                                 <label for="name">Name</label>
-                                <input type="text" th:field="*{username}" class="form-control" id="name" name="username" required>
+                                <input type="text" class="form-control" id="name" name="username" required>
                             </div>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="text" th:field="*{email}" class="form-control" id="email" name="email" required>
+                                <input type="text" class="form-control" id="email" name="email" required>
                             </div>
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <input type="text" th:field="*{password}" class="form-control" id="password" name="password" required>
+                                <input type="text" class="form-control" id="password" name="password" required>
                             </div>
 
                             <div class="form-group">
                                 <label>Roles</label>
-                                <div th:each="role : ${allRoles}">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="roles" th:value="${role.id}" th:text="${role.authority}" th:required="${role.authority == 'USER'}" />
-                                        </label>
-                                    </div>
-                                </div>
+                                <div id="roles-container"></div>
                             </div>
                             <button type="submit" class="btn btn-primary">Create User</button>
                         </form>
@@ -125,12 +100,6 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td th:text="${loggedUser.getId()}"></td>
-                            <td th:text="${loggedUser.getUsername()}"></td>
-                            <td th:text="${loggedUser.getEmail()}"></td>
-                            <td>
-                                <span th:each="role : ${loggedUser.getRoles()}" th:text="${role.getAuthority()}+' '"></span>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -138,192 +107,99 @@
         </div>
     </div>
 </div>
-<!-- Модальное окно удаления пользователя -->
-<div id="deleteUserModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="deleteForm">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete user</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="userIdDelete">User ID</label>
-                        <input type="text" class="form-control" id="userIdDelete" name="id" readonly/>
-                    </div>
-                    <div class="form-group">
-                        <label for="deleteUsername">Username</label>
-                        <input type="text" class="form-control" id="deleteUsername" name="username" disabled/>
-                    </div>
-                    <div class="form-group">
-                        <label for="deleteEmail">Email</label>
-                        <input type="text" class="form-control" id="deleteEmail" name="email" disabled/>
-                    </div>
-                    <div class="form-group">
-                        <label for="deletePassword">Password</label>
-                        <input type="text" class="form-control" id="deletePassword" name="password" disabled/>
-                    </div>
-                    <div class="form-group">
-                        <label for="deletePassword">Roles</label>
-                        <input type="text" class="form-control" id="deleteRoles" name="password" disabled/>
-                    </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="delete-user-button" type="submit" class="btn btn-danger">Delete</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<!-- Модальное окно редактирования пользователя -->
-<div id="editUserModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <form id="editForm">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit user</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="userIdDelete">User ID</label>
-                        <input type="text" class="form-control" id="userId" name="id" readonly/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Edit User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="editId" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editId" required readonly>
                     </div>
-                    <div class="form-group">
-                        <label for="editUsername">Username</label>
-                        <input type="text" class="form-control" id="editUsername" name="username" required/>
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editName" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input type="text" class="form-control" id="editEmail" name="email" required/>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editPassword">Password</label>
-                        <input type="text" class="form-control" id="editPassword" name="password" required/>
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="editPassword" required>
                     </div>
                     <div class="form-group">
                         <label>Roles</label>
-                        <div th:each="role : ${allRoles}">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" id="roles" name="editRoles" th:value="${role.id}" th:text="${role.authority}" th:required="${role.authority == 'USER'}" />
-                                </label>
-                            </div>
-                        </div>
+                        <div id="edit-roles-container"></div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="save-user-button" type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="editCloseButton">Close</button>
+                <button type="button" class="btn btn-primary" id="editOkButton">Edit User</button>
+            </div>
         </div>
     </div>
 </div>
 
+
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="deleteId" class="form-label">ID</label>
+                        <input type="text" class="form-control" id="deleteId" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteName" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="deleteName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="deleteEmail" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteRoles" class="form-label">Roles</label>
+                        <input type="text" class="form-control" id="deleteRoles" readonly>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="deleteCloseButton">Close</button>
+                <button type="button" class="btn btn-danger" id="deleteOkButton">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script>  // окно удаления
-    $(document).ready(function() {
-        $('#deleteUserModal').on('show.bs.modal', function(event) {
-            let button = $(event.relatedTarget);
-            let id = button.data('id');
-            let name = button.data('name');
-            let email = button.data('email');
-            let roles = button.data('roles').split(','); // Преобразование строки в список
 
-            let modal = $(this);
-            modal.find('#userIdDelete').val(id);
-            modal.find('#deleteUsername').val(name);
-            modal.find('#deleteEmail').val(email);
-            modal.find('#deleteRoles').val(roles);
-        });
-    })
-    $('#delete-user-button').click( function(event) {
-        event.preventDefault();
-        let userId = $('#userIdDelete').val();
-        let csrfToken = $("meta[name='_csrf']").attr("content");
-        let csrfHeader = $("meta[name='_csrf_header']").attr("content");
-        $.ajax({
-            url: '/admin/' + userId + '/delete',
-            type: 'POST',
-            data: {_method: 'delete'},
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader(csrfHeader, csrfToken);
-            },
-            success: function(result) {
-                location.reload();
-            }
-        });
 
-    });
+
+<script src="/js/admin.js">
+
 </script>
-<script>  // окно редактирования
-    $('#editUserModal').on('show.bs.modal', function (event) {
-        let button = $(event.relatedTarget); // Кнопка, вызвавшая модальное окно.
-        let userId = button.data('id');  // берём значения,
-        let username = button.data('name'); //      которые добавили в кнопку при генерерации таблицы
-        let email = button.data('email');
 
-        // Установка значений в поля формы
-        let modal = $(this);
-        modal.find('#userId').val(userId);
-        modal.find('#editUsername').val(username);
-        modal.find('#editEmail').val(email);
-
-    });
-
-    $('#save-user-button').click(function (event) {
-        event.preventDefault();
-        let modal = $('#editUserModal')
-        let userId = document.getElementById('userId').value;
-        let username = document.getElementById('editUsername').value;
-        let email = document.getElementById('editEmail').value;
-        let password = document.getElementById('editPassword').value;
-        let roles = [];
-        $('input[type=checkbox][name=editRoles]:checked').each(function() { // тут пушатся в "roles" те значения, которые помечены чекбоксом, в виде Long
-            roles.push($(this).val());
-        });
-        let csrfToken = $("meta[name='_csrf']").attr("content");
-        let csrfHeader = $("meta[name='_csrf_header']").attr("content");
-
-        let user = {
-            id: userId,
-            username: username,
-            email: email,
-            password: password,
-            roles: roles
-        };
-        $.ajax({
-            url: 'http://localhost:8080/admin',
-            type: 'PUT',
-            data: JSON.stringify(user),
-            dataType: 'json',
-            contentType: 'application/json',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader(csrfHeader, csrfToken);
-            },
-            success: function() {
-                location.reload();
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert("Error: " + jqXHR.status + "\ntext: "+ jqXHR.responseText + "\nerrorThrown: " + errorThrown);
-            }
-        })
-        modal.modal('hide');
-    })
-</script>
 <script>
     $(document).ready(function() {
         // Изначально спрятать панель своих юзерданных

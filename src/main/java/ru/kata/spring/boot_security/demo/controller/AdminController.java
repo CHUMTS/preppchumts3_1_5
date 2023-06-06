@@ -1,24 +1,20 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.model.UserDTO;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
 
@@ -31,43 +27,40 @@ public class AdminController {
     }
 
 
-    @GetMapping(produces="application/json")
-    public String usersListPage(Model model, Principal principal){
-        model.addAttribute("usersList", userService.getAllUsers());
-        model.addAttribute("loggedUser",
-                userService.findUserByEmail(principal.getName()));
-        model.addAttribute("allRoles", roleService.getAllRoles());
-        model.addAttribute("newUser", new User());
-        return "allUsers";
+    @GetMapping
+    public ModelAndView usersListPage(){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("allUsers");
+        return modelAndView;
+    }
+
+    @GetMapping("/roles")
+    public Set<Role> getAllRoles(){
+        return roleService.getAllRoles();
+    }
+
+    @GetMapping("/list")
+    public List<User> getAllUsers(){
+        return userService.getAllUsers();
     }
 
     @PutMapping
     public ResponseEntity<Void> receiveUserEditForm(@RequestBody UserDTO dto){
         userService.saveUser(userService.mapDTOToUser(dto));
-        return ResponseEntity.noContent().build();
-    }
-
-
-    @DeleteMapping(value = "/{id}/delete")
-    public String deleteUser(@PathVariable("id") Long id){
-        userService.removeUserById(id);
-        return "redirect:/admin";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping
-    public String receiveNewUserForm(User user, @RequestParam("roles") List<Long> roleIds){
-        user.setRoles(roleService.mapCollectionToRoles(roleIds));
-        userService.saveUser(user);
-        return "redirect:/admin";
+    public ResponseEntity<Void> receiveNewUserForm(@RequestBody UserDTO dto){
+        userService.saveUser(userService.mapDTOToUser(dto));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            new SecurityContextLogoutHandler().logout(request, response, auth);
-        }
-        return "redirect:/login?logout";
+    @DeleteMapping(value = "/{id}/delete")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){
+        userService.removeUserById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
 }
